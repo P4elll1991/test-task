@@ -1,0 +1,34 @@
+version: '1'
+
+services:
+  http-server:
+    network_mode: bridge
+    build:
+      context: .
+      dockerfile: http-server/Dockerfile
+    ports:
+      - 8000:8000
+    environment:
+      BROKER_ADDR: "localhost:50051"
+      PORT: ":8000"
+  broker:
+    network_mode: service:http-server
+    build:
+      context: .
+      dockerfile: broker/Dockerfile
+    environment:
+      PORT: ":50051"
+  event-server-1:
+    network_mode: service:http-server
+    build:
+      context: .
+      dockerfile: event-server/Dockerfile
+    environment:
+      PORT: ":9000"
+  event-server-2:
+    network_mode: service:http-server
+    build:
+      context: .
+      dockerfile: event-server/Dockerfile
+    environment:
+      PORT: ":9001"
