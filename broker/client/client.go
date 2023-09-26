@@ -10,10 +10,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+// client - объект реализующий gRPC клиент, который будет вызыват event-server
 type client struct {
 	conn *grpc.ClientConn
 }
 
+// connection - объект соединения с gRPC сервером
 type connection struct {
 	grpc   *grpc.ClientConn
 	ctx    context.Context
@@ -35,13 +37,18 @@ func New() *client {
 	return &client{}
 }
 
+func (conn *connection) Close() {
+	conn.cancel()
+	conn.grpc.Close()
+}
+
+// EventBus - отправляет data в gRPC сервер по destination
 func (client *client) EventBus(destination string, data []byte) error {
 	conn, err := newConnection(destination)
 	if err != nil {
 		return err
 	}
-	defer conn.grpc.Close()
-	defer conn.cancel()
+	defer conn.Close()
 
 	_, err = pb.NewEventServerClient(conn.grpc).EventBus(conn.ctx, &pb.EventBusRequest{
 		Event: &pb.Event{

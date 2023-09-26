@@ -10,11 +10,13 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
+// broker - интерфейс клиента, в который перенаправляются запросы
 type broker interface {
 	SendChallenge(destination string) error
 	SendMessage(destination string, data []byte) error
 }
 
+// server - http сервер
 type server struct {
 	port   string
 	broker broker
@@ -38,6 +40,7 @@ func (server *server) Run() {
 	httpServer.ListenAndServe()
 }
 
+// sendChallenge - обработчки sendChallenge
 func (server *server) sendChallenge(c *gin.Context) {
 	destination := c.Request.PostFormValue("destination")
 
@@ -51,6 +54,7 @@ func (server *server) sendChallenge(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]string{"status": "OK"})
 }
 
+// sendMessage - обработчки sendMessage
 func (server *server) sendMessage(c *gin.Context) {
 	data := []byte(c.Request.PostFormValue("data"))
 
