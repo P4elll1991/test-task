@@ -9,7 +9,15 @@
 
 ## Порядок тестирования:
 
-- необходимо собрать модули : 
+- необходимо скачать репозиторий : 
+```bash
+git clone git@github.com:P4elll1991/test-task.git
+```
+- зайти в директорию проекта : 
+```bash
+cd test-task
+```
+- собрать модули : 
 ```bash
 docker-compose build
 ```
@@ -51,11 +59,23 @@ $ go run test-client/main.go
 Ответ от сервера:
 {"details":"rpc error: code = Unavailable desc = rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing: dial tcp 127.0.0.1:9003: connect: connection refused\"","error":"there is no active gRPC server at destination","status":"ERROR"}
 ```
+
+#### Так же можно протестировать через curl:
+- Пример успешного запроса
+```bash
+$ curl 'http://localhost:8000/sendMessage' --form 'destination="localhost:9000"' --form 'data=@"./test-client/test"'
+{"status":"OK"}
+```
+- Пример не успешного запроса
+```bash
+$ curl 'http://localhost:8000/sendMessage' --form 'destination="localhost:9002"' --form 'data=@"./test-client/test"'
+{"details":"rpc error: code = Unavailable desc = rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing: dial tcp 127.0.0.1:9002: connect: connection refused\"","error":"there is no active gRPC server at destination","status":"ERROR"}
+```
 ### http-server:
 ---
 В HTTP сервере есть два хендлера:
 - POST sendChallenge: в form-data подается переменная destination string, являющаяся ip:port серверного gRPC (event-server). Вызывает у broker по grpc процедуру sendChallenge и передает в нее destination
-- POST sendMessage: в form-data подается destination string и data bytes. Вызывает у broker по gRPC процедуру sendMessage и и передает в нее destination и байты файла.
+- POST sendMessage: в form-data подается destination string и data bytes, которые берутся из файла, указанного также в form-data. Вызывает у broker по gRPC процедуру sendMessage и и передает в нее destination и байты файла.
 
 ### Структура ответа:
 ---

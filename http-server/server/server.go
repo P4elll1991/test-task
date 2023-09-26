@@ -56,10 +56,15 @@ func (server *server) sendChallenge(c *gin.Context) {
 
 // sendMessage - обработчки sendMessage
 func (server *server) sendMessage(c *gin.Context) {
-	data := []byte(c.Request.PostFormValue("data"))
+	data, err := getData(c)
+	if err != nil {
+		log.Printf("sendMessage: %s", err.Error())
+		c.AbortWithStatusJSON(parseError(err))
+		return
+	}
 
 	destination := c.Request.PostFormValue("destination")
-	err := server.broker.SendMessage(destination, data)
+	err = server.broker.SendMessage(destination, data)
 	if err != nil {
 		log.Printf("sendMessage: %s", err.Error())
 		c.AbortWithStatusJSON(parseError(err))

@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"crypto/rand"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"os"
 )
 
 func sendChallenge(destination string) {
@@ -62,6 +64,25 @@ func sendMessage(destination string) {
 	writer := multipart.NewWriter(body)
 
 	err := writer.WriteField("destination", destination)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Открытие файла для чтения.
+	file, err := os.Open("./test-client/test")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer file.Close()
+
+	// Создание части файла формы и его запись в запрос.
+	part, err := writer.CreateFormFile("data", "./test-client/test")
+	if err != nil {
+
+	}
+	_, err = io.Copy(part, file)
 	if err != nil {
 		fmt.Println(err)
 		return
