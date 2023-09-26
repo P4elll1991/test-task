@@ -17,7 +17,7 @@ docker-compose build
 ```bash
 docker-compose up
 ```
-- далее необходимо запустить тестовый http клиент : 
+- далее необходимо запустить тестовый http клиент в той же директории: 
 ```bash
 go run test-client/main.go
 ```
